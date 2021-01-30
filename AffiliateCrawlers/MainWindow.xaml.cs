@@ -1,10 +1,7 @@
-﻿using OpenQA.Selenium.Chrome;
+﻿using AffiliateCrawlers.Pages;
+using OpenQA.Selenium.Firefox;
 using System.Collections.Generic;
 using System.Windows;
-using System;
-using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium;
-using System.Threading.Tasks;
 
 namespace AffiliateCrawlers
 {
@@ -13,39 +10,45 @@ namespace AffiliateCrawlers
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly List<string> _listSourceLink = new List<string>
+        private List<string> _listPages = new List<string>
         {
-            "https://sablanca.vn/pages/tui-xach-moi-nhat",
-            "https://sablanca.vn/pages/giay-dep-moi-nhat",
-            "https://sablanca.vn/pages/giay-cao-got",
-            "https://sablanca.vn/tui-xach/danh-muc/backpack",
-            "https://sablanca.vn/vi-cam-tay",
+            "sablanca.vn",
+            "sexyforever.vn",
+            "sevenam.vn"
         };
 
-        private readonly string _host = "https://sablanca.vn/";
-        private readonly string _fileExtension = "txt";
-        private readonly string _fileName = "sablanca_";
-        private readonly string _chromeWebDriverPath = AppDomain.CurrentDomain.BaseDirectory;
-
         private FirefoxDriver _firefoxDriver;
-
 
         public MainWindow()
         {
             InitializeComponent();
+            cbbPageSelected.ItemsSource = _listPages;
+            cbbPageSelected.SelectedIndex = 0;
         }
 
         private void btnRun_Click(object sender, RoutedEventArgs e)
         {
-            var sourceLink = txtInputLink.Text;
             InitSelenium();
+            CrawlPageBase crawlPage = null;
+            switch (cbbPageSelected.SelectedItem.ToString())
+            {
+                case "sablanca.vn":
+                    crawlPage = new Sablanca(_firefoxDriver);
+                    break;
 
-            _firefoxDriver.Url = sourceLink;
-            _firefoxDriver.Navigate();
-            ScrollDown();
+                case "sexyforever.vn":
+                    crawlPage = new Sexyforever(_firefoxDriver);
+                    break;
+
+                case "sevenam.vn":
+                    break;
+
+                default:
+                    return;
+            }
+
+            var data = crawlPage.Start(1);
         }
-
-
 
         private void InitSelenium()
         {
@@ -54,48 +57,16 @@ namespace AffiliateCrawlers
 
         private void DisposeSelenium()
         {
-
-        }
-
-        private void GetAllData()
-        {
-            var itemsXPath = "//*[@id=\"5051HB011317857\"]";
-            var itemData = _firefoxDriver.FindElementByXPath(itemsXPath);
-
-
-            GetAnItems();
-        }
-
-        private void ScrollDown()
-        {
-            IJavaScriptExecutor js = _firefoxDriver;
-
-            var lastHeight = (long)js.ExecuteScript("return document.body.scrollHeight");
-
-            while (true)
-            {
-                js.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
-                Task.Delay(20000);
-                MessageBox.Show("Test");
-                var newHeight = (long)js.ExecuteScript("return document.body.scrollHeight");
-                if (newHeight == lastHeight)
-                {
-                    break;
-                }
-                lastHeight = newHeight;
-            }
         }
 
 
-        private List<string> GetAnItems()
+        private void btnExportFile_Click(object sender, RoutedEventArgs e)
         {
-            return new List<string>();
+            ExportFile();
         }
 
         private void ExportFile()
         {
-
-
             DisposeSelenium();
         }
     }
