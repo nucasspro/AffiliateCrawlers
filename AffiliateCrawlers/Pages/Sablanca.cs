@@ -26,7 +26,7 @@ namespace AffiliateCrawlers.Pages
             Driver = driver;
         }
 
-        public override List<string> Start(int numberOfItems)
+        public override async Task<List<string>> Start(int numberOfItems)
         {
             Driver.Url = sourceLink;
             Driver.Navigate();

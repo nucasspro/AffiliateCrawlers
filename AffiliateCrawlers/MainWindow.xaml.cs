@@ -1,5 +1,6 @@
 ﻿using AffiliateCrawlers.Pages;
 using OpenQA.Selenium.Firefox;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -47,7 +48,7 @@ namespace AffiliateCrawlers
                     return;
             }
 
-            var data = crawlPage.Start(1);
+            var data = crawlPage.Start(Convert.ToInt32(txtInputQuantity.Text));
         }
 
         private void InitSelenium()

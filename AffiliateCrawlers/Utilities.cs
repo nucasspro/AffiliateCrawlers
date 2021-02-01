@@ -1,6 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace AffiliateCrawlers
 {
@@ -15,7 +15,7 @@ namespace AffiliateCrawlers
             while (true)
             {
                 js.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
-                Thread.Sleep(5000);
+                Task.Delay(2000);
 
                 var newHeight = (long)js.ExecuteScript("return document.body.scrollHeight");
                 if (newHeight == lastHeight)
