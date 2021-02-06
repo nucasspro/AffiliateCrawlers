@@ -1,0 +1,92 @@
+﻿<Window
+    x:Class="AffiliateCrawlers.Views.MainWindowView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cal="http://caliburnmicro.com"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:AffiliateCrawlers.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="{Binding MainScreenTitle}"
+    Width="800"
+    Height="450"
+    cal:Message.Attach="[Event Loaded=] = [Action Loaded()]"
+    mc:Ignorable="d">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="3.5*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <StackPanel
+                Grid.Row="0"
+                Margin="10"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Orientation="Horizontal">
+
+                <Label Content="Main page" />
+                <ComboBox
+                    x:Name="cbbMainPage"
+                    Width="120"
+                    cal:Message.Attach="[Event SelectionChanged] = [CbbMainPageSelectionChanged]"
+                    ItemsSource="{Binding CbbMainPageItemsSource}"
+                    SelectedIndex="{Binding CbbMainPageSelectedIndex}" />
+
+                <Label Margin="20,0,0,0" Content="Child page" />
+                <ComboBox
+                    x:Name="cbbChildPage"
+                    Width="300"
+                    ItemsSource="{Binding CbbChildPageItemsSource}"
+                    SelectedIndex="{Binding CbbChildPageSelectedIndex}" />
+
+                <Label Margin="20,0,0,0" Content="Number of item" />
+                <TextBox
+                    x:Name="txtInputQuantity"
+                    Width="50"
+                    Height="23"
+                    MaxLength="3"
+                    Text="{Binding TxtQuantity}"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap" />
+
+            </StackPanel>
+
+            <StackPanel
+                Grid.Row="1"
+                Margin="10"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    x:Name="btnRun"
+                    Width="75"
+                    cal:Message.Attach="[Event Click] = [Action StartCrawl]"
+                    Content="Run" />
+                <Button
+                    x:Name="btnExportFile"
+                    Width="75"
+                    Margin="20,0,0,0"
+                    cal:Message.Attach="[Event Click] = [Action ExportFile()]"
+                    Content="Export file" />
+            </StackPanel>
+        </Grid>
+
+        <RichTextBox
+            x:Name="rtbAllData"
+            Grid.Row="1"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Stretch">
+            <FlowDocument>
+                <Paragraph>
+                    <Run Text="RichTextBox" />
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
+
+    </Grid>
+</Window>

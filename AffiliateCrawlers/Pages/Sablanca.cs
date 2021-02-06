@@ -7,17 +7,6 @@ namespace AffiliateCrawlers.Pages
 {
     public class Sablanca : CrawlPageBase
     {
-        private readonly List<string> _listSourceLink = new List<string>
-        {
-            "https://sablanca.vn/pages/tui-xach-moi-nhat",
-            "https://sablanca.vn/pages/giay-dep-moi-nhat",
-            "https://sablanca.vn/pages/giay-cao-got",
-            "https://sablanca.vn/tui-xach/danh-muc/backpack",
-            "https://sablanca.vn/vi-cam-tay",
-        };
-        
-        public string sourceLink = "";
-
         public Sablanca(RemoteWebDriver driver)
         {
             Host = "https://sablanca.vn/";
@@ -26,9 +15,9 @@ namespace AffiliateCrawlers.Pages
             Driver = driver;
         }
 
-        public override async Task<List<string>> Start(int numberOfItems)
+        public override async Task<List<string>> Start(string url, int numberOfItems)
         {
-            Driver.Url = sourceLink;
+            Driver.Url = url;
             Driver.Navigate();
             Utilities.ScrollDown(Driver);
 

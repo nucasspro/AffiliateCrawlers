@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Animation;
 
 namespace AffiliateCrawlers.Pages
 {
@@ -15,37 +16,27 @@ namespace AffiliateCrawlers.Pages
     {
         private readonly List<string> _listSourceLink = new List<string>
         {
-            "https://sexyforever.vn/collections/sleepwear",
-            "https://sexyforever.vn/collections/ao-khoac-ngu",
-            "https://sexyforever.vn/collections/lingeries-set",
-            "https://sexyforever.vn/collections/body-suit"
+
         };
 
         public string sourceLink = "";
 
-        public Sexyforever(RemoteWebDriver driver)
+        public Sexyforever(RemoteWebDriver driver = null)
         {
-            Host = "https://sexyforever.vn/";
+            Host = "https://sexyforever.vn";
             FileExtension = "txt";
             FileName = "sexyforever_";
             Driver = driver;
         }
 
-        public override async Task<List<string>> Start(int numberOfItems)
+        public override async Task<List<string>> Start(string url, int numberOfItems)
         {
             try
             {
-                var url = _listSourceLink[0];
                 var web = new HtmlWeb();
                 HtmlDocument doc = web.Load(url);
-                var document = doc.DocumentNode;
-                var a = document.QuerySelectorAll(".content");
-
-                //Driver.Url = _listSourceLink[0];
-                //Driver.Navigate();
-                //Utilities.ScrollDown(Driver);
-
-                //var allItemLinks = GetAllItemLinks();
+                HtmlNode document = doc.DocumentNode;
+                var allProductLink = GetAllProductLink(document, numberOfItems).ToList();
 
                 //if (numberOfItems > allItemLinks.Count)
                 //{
@@ -66,13 +57,37 @@ namespace AffiliateCrawlers.Pages
 
         }
 
-        private List<string> GetAllItemLinks()
+        private IEnumerable<string> GetAllProductLink(HtmlNode document, int quantity)
         {
-            const string itemsXPath = "//*[@id=\"collection-wrapper\"]/div/div/div/div[1]/div/div[2]/div[1]";
-            var allItems = Driver.FindElementsByXPath(itemsXPath)[0].FindElements(By.CssSelector("div.product-img > a"));
+            List<string> links = new();
+            if (links.Count < quantity)
+            {
 
-            return (ExtractLink(allItems)).ToList();
+            }
+            var links = GetProductLinkOfPage(document);
+            if (quantity > links.Count)
+            {
+                quantity = links.Count;
+            }
+            else
+            {
+
+            }
+
+            for (int i = 0; i < quantity; i++)
+            {
+                yield return $"{ Host }{ links[i].GetAttributeValue("href", string.Empty) }";
+            }
         }
+
+        private void HasNextPage()
+        {
+
+        }
+
+
+        private List<HtmlNode> GetProductLinkOfPage(HtmlNode document) => document.QuerySelectorAll(".product-img > a").ToList();
+
 
         public override List<string> GetAllItems(int numberOfItems)
         {

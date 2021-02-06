@@ -11,7 +11,7 @@ namespace AffiliateCrawlers.Pages
         public string FileName = "";
         public RemoteWebDriver Driver;
 
-        public virtual async Task<List<string>> Start(int numberOfItems)
+        public virtual async Task<List<string>> Start(string url, int numberOfItems)
         {
             await Task.Run(()=> { });
             return new List<string>();
