@@ -1,4 +1,6 @@
 ﻿using AffiliateCrawlers.Models;
+using Fizzler.Systems.HtmlAgilityPack;
+using HtmlAgilityPack;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 using System.Collections.Generic;
@@ -33,24 +35,30 @@ namespace AffiliateCrawlers.Pages
         {
             try
             {
-                Driver.Url = _listSourceLink[0];
-                Driver.Navigate();
-                Utilities.ScrollDown(Driver);
+                var url = _listSourceLink[0];
+                var web = new HtmlWeb();
+                HtmlDocument doc = web.Load(url);
+                var document = doc.DocumentNode;
+                var a = document.QuerySelectorAll(".content");
 
-                var allItemLinks = GetAllItemLinks();
+                //Driver.Url = _listSourceLink[0];
+                //Driver.Navigate();
+                //Utilities.ScrollDown(Driver);
 
-                if (numberOfItems > allItemLinks.Count)
-                {
-                    numberOfItems = allItemLinks.Count;
-                }
+                //var allItemLinks = GetAllItemLinks();
 
-                var filterLink = allItemLinks.Take(numberOfItems);
+                //if (numberOfItems > allItemLinks.Count)
+                //{
+                //    numberOfItems = allItemLinks.Count;
+                //}
 
-                var allItemInfo = await GetItemInfo(filterLink);
+                //var filterLink = allItemLinks.Take(numberOfItems);
+
+                //var allItemInfo = await GetItemInfo(filterLink);
 
                 return new List<string>();
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
                 MessageBox.Show("Không thể mở trang");
                 return new List<string>();
