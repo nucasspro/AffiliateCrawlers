@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using AffiliateCrawlers.Models;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,13 +16,14 @@ namespace AffiliateCrawlers.Pages
             Driver = driver;
         }
 
-        public override async Task<List<string>> Start(string url, int numberOfItems)
+        public override async Task<List<ProductInfoModel>> Start(string url, int numberOfItems)
         {
             Driver.Url = url;
             Driver.Navigate();
             Utilities.ScrollDown(Driver);
 
-            return GetAllItems(1);
+             GetAllItems(1);
+            return null;
         }
 
         public override List<string> GetAllItems(int numberOfItems)

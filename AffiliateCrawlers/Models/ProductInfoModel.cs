@@ -2,7 +2,7 @@
 
 namespace AffiliateCrawlers.Models
 {
-    public class ItemInfoModel
+    public class ProductInfoModel
     {
         public string Title { get; set; }
         public string OriginalPrice { get; set; }

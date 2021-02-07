@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Animation;
+using System;
 
 namespace AffiliateCrawlers.Pages
 {
@@ -16,7 +16,6 @@ namespace AffiliateCrawlers.Pages
     {
         private readonly List<string> _listSourceLink = new List<string>
         {
-
         };
 
         public string sourceLink = "";
@@ -29,64 +28,80 @@ namespace AffiliateCrawlers.Pages
             Driver = driver;
         }
 
-        public override async Task<List<string>> Start(string url, int numberOfItems)
+        public override async Task<List<ProductInfoModel>> Start(string url, int numberOfItems)
         {
             try
             {
                 var web = new HtmlWeb();
                 HtmlDocument doc = web.Load(url);
                 HtmlNode document = doc.DocumentNode;
-                var allProductLink = GetAllProductLink(document, numberOfItems).ToList();
+                var allProductLink = GetAllProductLink(document, numberOfItems);
 
-                //if (numberOfItems > allItemLinks.Count)
-                //{
-                //    numberOfItems = allItemLinks.Count;
-                //}
-
-                //var filterLink = allItemLinks.Take(numberOfItems);
-
-                //var allItemInfo = await GetItemInfo(filterLink);
-
-                return new List<string>();
+                return GetAllProductInfo(document, allProductLink).ToList();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Không thể mở trang");
-                return new List<string>();
+                return null;
             }
-
         }
 
         private IEnumerable<string> GetAllProductLink(HtmlNode document, int quantity)
         {
-            List<string> links = new();
-            if (links.Count < quantity)
-            {
-
-            }
             var links = GetProductLinkOfPage(document);
             if (quantity > links.Count)
             {
                 quantity = links.Count;
             }
-            else
-            {
-
-            }
 
             for (int i = 0; i < quantity; i++)
             {
-                yield return $"{ Host }{ links[i].GetAttributeValue("href", string.Empty) }";
+                yield return GetProductLink(links[i]);
             }
         }
 
         private void HasNextPage()
         {
-
         }
 
-
         private List<HtmlNode> GetProductLinkOfPage(HtmlNode document) => document.QuerySelectorAll(".product-img > a").ToList();
+
+        private string GetProductLink(HtmlNode document) => $"{ Host }{ document.GetAttributeValue("href", string.Empty) }";
+
+
+        private IEnumerable<ProductInfoModel> GetAllProductInfo(HtmlNode document, IEnumerable<string> urls)
+        {
+            return urls.Select(url => GetProductInfo(document, url));
+        }
+
+        private ProductInfoModel GetProductInfo(HtmlNode document, string url)
+        {
+            var web = new HtmlWeb();
+            HtmlDocument doc = web.Load(url);
+            document = doc.DocumentNode;
+
+            string title = document.QuerySelector(".product-content > .pro-content-head > h1").InnerText;
+            string content = document.QuerySelector(".product-content > .pro-short-desc").InnerHtml.Replace("\t", "").Replace(" style=\"font-size: 12pt;\"", ""); ;
+            string originalPrice = document.QuerySelector(".product-content > .pro-price > .current-price").InnerText.Replace("₫", "").Replace(",", ""); ;
+            string salePrice = originalPrice;
+
+            List<string> imageLinks = new();
+            foreach (var item in document.QuerySelectorAll("#ProductThumbs > div.inner > li > a").ToList())
+            {
+                imageLinks.Add($"https:{ item.GetAttributeValue("href", string.Empty) }");
+            }
+
+            return new ProductInfoModel()
+            {
+                Title = title,
+                Url = url,
+                Content = content,
+                OriginalPrice = originalPrice,
+                SalePrice = salePrice,
+                ImageLinks = imageLinks
+            };
+        }
+
 
 
         public override List<string> GetAllItems(int numberOfItems)
@@ -94,9 +109,9 @@ namespace AffiliateCrawlers.Pages
             return base.GetAllItems(numberOfItems);
         }
 
-        private async Task<IEnumerable<ItemInfoModel>> GetItemInfo(IEnumerable<string> links)
+        private async Task<IEnumerable<ProductInfoModel>> GetItemInfo(IEnumerable<string> links)
         {
-            var itemInfoList = new List<ItemInfoModel>();
+            var itemInfoList = new List<ProductInfoModel>();
 
             foreach (var link in links)
             {
@@ -104,9 +119,9 @@ namespace AffiliateCrawlers.Pages
                 Driver.ExecuteScript($"window.open('{link}', 'new_window')");
                 Driver.SwitchTo().Window(Driver.WindowHandles[1]);
 
-                itemInfoList.Add(new ItemInfoModel
+                itemInfoList.Add(new ProductInfoModel
                 {
-                    Title = GetProductTitle(),
+                    Title = ""/*GetProductTitle()*/,
                     Url = link,
                     Content = GetProductContent(),
                     OriginalPrice = GetProductSalePrice(),
@@ -122,11 +137,12 @@ namespace AffiliateCrawlers.Pages
             return itemInfoList;
         }
 
-        private string GetProductTitle()
-        {
-            const string titleXPath = "//*[@id=\"product-wrapper\"]/div/div/div/div/div[1]/div/div[2]/div/div[1]/h1";
-            return Driver.FindElementByXPath(titleXPath).GetAttribute("innerHTML");
-        }
+
+        //private string GetProductTitle()
+        //{
+        //    const string titleXPath = "//*[@id=\"product-wrapper\"]/div/div/div/div/div[1]/div/div[2]/div/div[1]/h1";
+        //    return Driver.FindElementByXPath(titleXPath).GetAttribute("innerHTML");
+        //}
 
         private string GetProductContent()
         {

@@ -1,4 +1,5 @@
-﻿using AffiliateCrawlers.Pages;
+﻿using AffiliateCrawlers.Models;
+using AffiliateCrawlers.Pages;
 using Caliburn.Micro;
 using System;
 using System.Collections.Generic;
@@ -72,6 +73,14 @@ namespace AffiliateCrawlers.ViewModels
             set { _txtQuantity = value; NotifyOfPropertyChange(() => TxtQuantity); }
         }
 
+        private string _tbxAllData;
+
+        public string TbxAllData
+        {
+            get => _tbxAllData;
+            set { _tbxAllData = value; NotifyOfPropertyChange(() => TbxAllData); }
+        }
+
         public void CbbMainPageSelectionChanged()
         {
             CbbChildPageItemsSource = new ObservableCollection<string>(cbbChildPageItemsSource[CbbMainPageSelectedIndex]);
@@ -86,7 +95,7 @@ namespace AffiliateCrawlers.ViewModels
 
         private CrawlPageBase _crawlPage;
 
-        public void StartCrawl()
+        public async void StartCrawl()
         {
             string crawlLink = CbbChildPageItemsSource[CbbChildPageSelectedIndex];
             switch (CbbMainPageItemsSource[CbbMainPageSelectedIndex])
@@ -106,7 +115,26 @@ namespace AffiliateCrawlers.ViewModels
                     return;
             }
 
-            var data = _crawlPage.Start(crawlLink, TxtQuantity);
+            var data = await _crawlPage.Start(crawlLink, TxtQuantity);
+            UpdateGUI(data);
+        }
+
+        private void UpdateGUI(List<ProductInfoModel> data)
+        {
+            foreach (var item in data)
+            {
+                TbxAllData += "======================================" +
+                    $"ProductName = { item.Title }{ Environment.NewLine }" +
+                    $"OriginalPrice = { item.OriginalPrice }{ Environment.NewLine }" +
+                    $"SalePrice = { item.SalePrice }{ Environment.NewLine }" +
+                    $"Content = { item.Content }{ Environment.NewLine }" +
+                    $"ImageLinks = { Environment.NewLine }";
+
+                foreach (var link in item.ImageLinks)
+                {
+                    TbxAllData += $"\t{ link }{ Environment.NewLine}";
+                }
+            }
         }
 
         public void ExportFile()

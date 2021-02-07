@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium.Remote;
+﻿using AffiliateCrawlers.Models;
+using OpenQA.Selenium.Remote;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,10 +12,10 @@ namespace AffiliateCrawlers.Pages
         public string FileName = "";
         public RemoteWebDriver Driver;
 
-        public virtual async Task<List<string>> Start(string url, int numberOfItems)
+        public virtual async Task<List<ProductInfoModel>> Start(string url, int numberOfItems)
         {
             await Task.Run(()=> { });
-            return new List<string>();
+            return null;
         }
         public virtual List<string> GetAllItems(int numberOfItems)
         {

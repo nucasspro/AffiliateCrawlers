@@ -76,17 +76,12 @@
             </StackPanel>
         </Grid>
 
-        <RichTextBox
-            x:Name="rtbAllData"
-            Grid.Row="1"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Stretch">
-            <FlowDocument>
-                <Paragraph>
-                    <Run Text="RichTextBox" />
-                </Paragraph>
-            </FlowDocument>
-        </RichTextBox>
-
+        <ScrollViewer Grid.Row="1">
+            <TextBlock
+                x:Name="tbxAllData"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top"
+                Text="{Binding TbxAllData}" />
+        </ScrollViewer>
     </Grid>
 </Window>
