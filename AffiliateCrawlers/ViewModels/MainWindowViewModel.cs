@@ -123,7 +123,7 @@ namespace AffiliateCrawlers.ViewModels
         {
             foreach (var item in data)
             {
-                TbxAllData += "======================================" +
+                TbxAllData += $"======================================{ Environment.NewLine }" +
                     $"ProductName = { item.Title }{ Environment.NewLine }" +
                     $"OriginalPrice = { item.OriginalPrice }{ Environment.NewLine }" +
                     $"SalePrice = { item.SalePrice }{ Environment.NewLine }" +
