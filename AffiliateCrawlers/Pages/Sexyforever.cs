@@ -5,6 +5,8 @@ using OpenQA.Selenium.Remote;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
 using System.Windows;
 
 namespace AffiliateCrawlers.Pages
@@ -139,10 +141,14 @@ namespace AffiliateCrawlers.Pages
         /// <returns></returns>
         private string GetProductContent(HtmlNode document)
         {
-            return document.QuerySelector(".product-content > .pro-short-desc")
+            var content = document.QuerySelector(".product-content > .pro-short-desc")
                 .InnerHtml
-                .Replace("\t", "")
-                .Replace(" style=\"font-size: 12pt;\"", "");
+                .Replace("\t", "");
+
+            Regex regex = new("(<span).*?(\">)");
+            content = regex.Replace(content, "<span>");
+
+            return HttpUtility.HtmlDecode(content);
         }
 
         /// <summary>

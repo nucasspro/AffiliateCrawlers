@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -38,7 +39,8 @@ namespace AffiliateCrawlers
         {
             try
             {
-                string path = Path.Combine(Directory.GetCurrentDirectory(), $"{fileName}{DateTime.Now:yyyyMMdd}.csv");
+                string path = Path.Combine(Directory.GetCurrentDirectory(), $"{fileName}{DateTime.Now.ToString("yyyyMMdd_hhmmss")}.txt");
+                List<string> header = new() { "Name", "Url", "OriginalPrice", "SalePrice", "Content", "ImageLinks" };
 
                 using var writer = new StreamWriter(path);
                 using var csvWriter = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -46,7 +48,7 @@ namespace AffiliateCrawlers
                     Delimiter = ";"
                 });
 
-                csvWriter.WriteHeader<ProductInfoModel>();
+                header.ForEach(x => csvWriter.WriteField(x));
                 csvWriter.NextRecord();
 
                 foreach (var item in data)
@@ -56,7 +58,11 @@ namespace AffiliateCrawlers
                     csvWriter.WriteField(item.OriginalPrice);
                     csvWriter.WriteField(item.SalePrice);
                     csvWriter.WriteField(item.Content);
-                    csvWriter.WriteField(item.ImageLinks);
+
+                    StringBuilder imageLinkText = new();
+                    item.ImageLinks.ForEach(x => imageLinkText.Append(x).Append(Environment.NewLine));
+                    csvWriter.WriteField(imageLinkText);
+
                     csvWriter.NextRecord();
                 }
 
