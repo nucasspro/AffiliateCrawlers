@@ -11,12 +11,11 @@ namespace AffiliateCrawlers.Pages
         public Sablanca(RemoteWebDriver driver)
         {
             Host = "https://sablanca.vn/";
-            FileExtension = "txt";
             FileName = "sablanca_";
             Driver = driver;
         }
 
-        public override async Task<List<ProductInfoModel>> Start(string url, int numberOfItems)
+        public override List<ProductInfoModel> Start(string url, int numberOfItems)
         {
             Driver.Url = url;
             Driver.Navigate();

@@ -95,7 +95,9 @@ namespace AffiliateCrawlers.ViewModels
 
         private CrawlPageBase _crawlPage;
 
-        public async void StartCrawl()
+        private List<ProductInfoModel> _data = new();
+
+        public void StartCrawl()
         {
             string crawlLink = CbbChildPageItemsSource[CbbChildPageSelectedIndex];
             switch (CbbMainPageItemsSource[CbbMainPageSelectedIndex])
@@ -115,8 +117,8 @@ namespace AffiliateCrawlers.ViewModels
                     return;
             }
 
-            var data = await _crawlPage.Start(crawlLink, TxtQuantity);
-            UpdateGUI(data);
+            _data = _crawlPage.Start(crawlLink, TxtQuantity);
+            UpdateGUI(_data);
         }
 
         private void UpdateGUI(List<ProductInfoModel> data)
@@ -124,7 +126,7 @@ namespace AffiliateCrawlers.ViewModels
             foreach (var item in data)
             {
                 TbxAllData += $"======================================{ Environment.NewLine }" +
-                    $"ProductName = { item.Title }{ Environment.NewLine }" +
+                    $"ProductName = { item.Name }{ Environment.NewLine }" +
                     $"OriginalPrice = { item.OriginalPrice }{ Environment.NewLine }" +
                     $"SalePrice = { item.SalePrice }{ Environment.NewLine }" +
                     $"Content = { item.Content }{ Environment.NewLine }" +
@@ -139,6 +141,12 @@ namespace AffiliateCrawlers.ViewModels
 
         public void ExportFile()
         {
+            if (_crawlPage is null || _data.Count is 0)
+            {
+                return;
+            }
+
+            Utilities.ExportToCSVFile(_crawlPage.FileName, _data);
         }
     }
 }
