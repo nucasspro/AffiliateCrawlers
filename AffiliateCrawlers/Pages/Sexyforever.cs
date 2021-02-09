@@ -69,7 +69,7 @@ namespace AffiliateCrawlers.Pages
                     links.Add($"{ Host }{ item.GetAttributeValue("href", string.Empty) }");
                 }
 
-                if (!HasNextPage(document, ref nextPageLink))
+                if (!HasNextPage(document, ref url))
                 {
                     break;
                 }
@@ -188,7 +188,11 @@ namespace AffiliateCrawlers.Pages
             if (nextButton is not null)
             {
                 nextPageLink = nextButton.GetAttributeValue("href", string.Empty);
-                return nextPageLink != string.Empty;
+                if (nextPageLink.Length != 0)
+                {
+                    nextPageLink = $"{ Host }{ nextPageLink }";
+                    return true;
+                }
             }
             return false;
         }
