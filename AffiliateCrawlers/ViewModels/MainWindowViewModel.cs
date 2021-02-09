@@ -111,6 +111,7 @@ namespace AffiliateCrawlers.ViewModels
                     break;
 
                 case "sevenam.vn":
+                    _crawlPage = new Sevenam();
                     break;
 
                 default:

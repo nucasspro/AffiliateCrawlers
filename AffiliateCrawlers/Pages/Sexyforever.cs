@@ -64,16 +64,24 @@ namespace AffiliateCrawlers.Pages
             {
                 doc = web.Load(url);
                 document = doc.DocumentNode;
-                foreach (var item in document.QuerySelectorAll(".product-img > a").ToList())
+                var urls = document.QuerySelectorAll(".product-img > a").ToList();
+                if (urls.Count == 0)
+                {
+                    break;
+                }
+                foreach (var item in urls)
                 {
                     links.Add($"{ Host }{ item.GetAttributeValue("href", string.Empty) }");
+                    if (links.Count >= quantity)
+                    {
+                        return links;
+                    }
                 }
 
                 if (!HasNextPage(document, ref url))
                 {
                     break;
                 }
-
             } while (links.Count < quantity);
 
             return links;
@@ -113,6 +121,16 @@ namespace AffiliateCrawlers.Pages
             res.ImageLinks = GetProductImages(document).ToList();
 
             return res;
+        }
+
+        /// <summary>
+        /// Get product content
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        private string GetProductName(HtmlNode document)
+        {
+            return document.QuerySelector(".product-content > .pro-content-head > h1").InnerText;
         }
 
         /// <summary>
@@ -160,16 +178,6 @@ namespace AffiliateCrawlers.Pages
         }
 
         /// <summary>
-        /// Get product content
-        /// </summary>
-        /// <param name="document"></param>
-        /// <returns></returns>
-        private string GetProductName(HtmlNode document)
-        {
-            return document.QuerySelector(".product-content > .pro-content-head > h1").InnerText;
-        }
-
-        /// <summary>
         /// Get product image links
         /// </summary>
         /// <param name="document"></param>
@@ -182,6 +190,12 @@ namespace AffiliateCrawlers.Pages
                 .Select(item => $"https:{ item.GetAttributeValue("href", string.Empty) }");
         }
 
+        /// <summary>
+        /// Can go next page
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="nextPageLink"></param>
+        /// <returns></returns>
         private bool HasNextPage(HtmlNode document, ref string nextPageLink)
         {
             var nextButton = document.QuerySelector(".nextPage > a");
