@@ -11,12 +11,17 @@ namespace AffiliateCrawlers.Pages
         public string FileName = "";
         public RemoteWebDriver Driver;
 
-        public virtual List<ProductInfoModel> Start(string url, int numberOfItems)
+        public virtual List<ProductInfoModel> Start(string url, int quantity)
         {
             return new List<ProductInfoModel>();
         }
 
-        public virtual IEnumerable<string> GetAllProductLink(HtmlNode document, int quantity)
+        public virtual List<string> GetAllProductLink(HtmlNode document, int quantity)
+        {
+            return null;
+        }
+
+        public virtual List<string> GetAllProductLink2(HtmlWeb web, string url, int quantity)
         {
             return null;
         }

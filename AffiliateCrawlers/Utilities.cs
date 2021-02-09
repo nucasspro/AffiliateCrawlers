@@ -39,8 +39,8 @@ namespace AffiliateCrawlers
         {
             try
             {
-                string path = Path.Combine(Directory.GetCurrentDirectory(), $"{fileName}{DateTime.Now.ToString("yyyyMMdd_hhmmss")}.txt");
-                List<string> header = new() { "Name", "Url", "OriginalPrice", "SalePrice", "Content", "ImageLinks" };
+                string path = Path.Combine(Directory.GetCurrentDirectory(), $"{fileName}{DateTime.Now:yyyyMMdd_hhmmss}.txt");
+                List<string> header = new() { "No", "Name", "Url", "OriginalPrice", "SalePrice", "Content", "ImageLinks" };
 
                 using var writer = new StreamWriter(path);
                 using var csvWriter = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -51,16 +51,17 @@ namespace AffiliateCrawlers
                 header.ForEach(x => csvWriter.WriteField(x));
                 csvWriter.NextRecord();
 
-                foreach (var item in data)
+                for (int i = 0; i < data.Count; i++)
                 {
-                    csvWriter.WriteField(item.Name);
-                    csvWriter.WriteField(item.Url);
-                    csvWriter.WriteField(item.OriginalPrice);
-                    csvWriter.WriteField(item.SalePrice);
-                    csvWriter.WriteField(item.Content);
+                    csvWriter.WriteField(i + 1);
+                    csvWriter.WriteField(data[i].Name);
+                    csvWriter.WriteField(data[i].Url);
+                    csvWriter.WriteField(data[i].OriginalPrice);
+                    csvWriter.WriteField(data[i].SalePrice);
+                    csvWriter.WriteField(data[i].Content);
 
                     StringBuilder imageLinkText = new();
-                    item.ImageLinks.ForEach(x => imageLinkText.Append(x).Append(Environment.NewLine));
+                    data[i].ImageLinks.ForEach(x => imageLinkText.Append(x).Append(Environment.NewLine));
                     csvWriter.WriteField(imageLinkText);
 
                     csvWriter.NextRecord();

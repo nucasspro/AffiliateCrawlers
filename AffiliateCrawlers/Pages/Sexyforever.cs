@@ -30,18 +30,14 @@ namespace AffiliateCrawlers.Pages
         /// <param name="url"></param>
         /// <param name="numberOfItems"></param>
         /// <returns></returns>
-        public override List<ProductInfoModel> Start(string url, int numberOfItems)
+        public override List<ProductInfoModel> Start(string url, int quantity)
         {
             try
             {
                 var web = new HtmlWeb();
-                HtmlDocument doc = web.Load(url);
-                HtmlNode document = doc.DocumentNode;
-                var allProductLink = GetAllProductLink(document, numberOfItems);
+                var productUrls = GetAllProductLink2(web, url, quantity);
 
-                var products = GetAllProductInfo(document, allProductLink).ToList();
-
-                return products;
+                return GetAllProductInfo(web, productUrls).ToList();
             }
             catch (Exception ex)
             {
@@ -56,18 +52,31 @@ namespace AffiliateCrawlers.Pages
         /// <param name="document"></param>
         /// <param name="quantity"></param>
         /// <returns></returns>
-        public override IEnumerable<string> GetAllProductLink(HtmlNode document, int quantity)
+        public override List<string> GetAllProductLink2(HtmlWeb web, string url, int quantity)
         {
-            var links = document.QuerySelectorAll(".product-img > a").ToList();
-            if (quantity > links.Count)
-            {
-                quantity = links.Count;
-            }
+            List<string> links = new();
+            string nextPageLink = string.Empty;
 
-            for (int i = 0; i < quantity; i++)
+            HtmlDocument doc;
+            HtmlNode document;
+
+            do
             {
-                yield return $"{ Host }{ links[i].GetAttributeValue("href", string.Empty) }";
-            }
+                doc = web.Load(url);
+                document = doc.DocumentNode;
+                foreach (var item in document.QuerySelectorAll(".product-img > a").ToList())
+                {
+                    links.Add($"{ Host }{ item.GetAttributeValue("href", string.Empty) }");
+                }
+
+                if (!HasNextPage(document, ref nextPageLink))
+                {
+                    break;
+                }
+
+            } while (links.Count < quantity);
+
+            return links;
         }
 
         /// <summary>
@@ -76,11 +85,11 @@ namespace AffiliateCrawlers.Pages
         /// <param name="document"></param>
         /// <param name="urls"></param>
         /// <returns></returns>
-        private IEnumerable<ProductInfoModel> GetAllProductInfo(HtmlNode document, IEnumerable<string> urls)
+        private IEnumerable<ProductInfoModel> GetAllProductInfo(HtmlWeb web, IEnumerable<string> urls)
         {
             foreach (var url in urls)
             {
-                yield return GetProductInfo(document, url);
+                yield return GetProductInfo(web, url);
             }
         }
 
@@ -90,11 +99,10 @@ namespace AffiliateCrawlers.Pages
         /// <param name="document"></param>
         /// <param name="url"></param>
         /// <returns></returns>
-        private ProductInfoModel GetProductInfo(HtmlNode document, string url)
+        private ProductInfoModel GetProductInfo(HtmlWeb web, string url)
         {
-            var web = new HtmlWeb();
             HtmlDocument doc = web.Load(url);
-            document = doc.DocumentNode;
+            HtmlNode document = doc.DocumentNode;
 
             ProductInfoModel res = new();
             res.Name = GetProductName(document);
@@ -174,8 +182,15 @@ namespace AffiliateCrawlers.Pages
                 .Select(item => $"https:{ item.GetAttributeValue("href", string.Empty) }");
         }
 
-        private void HasNextPage()
+        private bool HasNextPage(HtmlNode document, ref string nextPageLink)
         {
+            var nextButton = document.QuerySelector(".nextPage > a");
+            if (nextButton is not null)
+            {
+                nextPageLink = nextButton.GetAttributeValue("href", string.Empty);
+                return nextPageLink != string.Empty;
+            }
+            return false;
         }
     }
 }
