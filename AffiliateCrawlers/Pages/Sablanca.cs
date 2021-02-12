@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 
 namespace AffiliateCrawlers.Pages
 {
@@ -81,13 +80,29 @@ namespace AffiliateCrawlers.Pages
                 var allData = JsonConvert.DeserializeObject<List<SablancaModel>>(response.Content);
                 foreach (var item in allData)
                 {
-                    links.Add
+                    links.Add("");
                 }
 
 
                 pageIndex++;
             } while (links.Count < quantity);
             return new List<string>();
+        }
+
+
+        public void GetData()
+        {
+            //ITEMNAME
+            //LISTIMAGES
+            //giam gia SALEPRICE
+            //gia goc RETAILPRICE
+
+            //MATERIALTEXT: chất liệu
+            //STRAPTYPETEXT: Loại dây đeo
+            //DIMENSION: kích thước
+            //COMPARTMENT: số ngăn
+            //STYLETEXT: Dòng
+            //DESCRIPTION: Mô tả
         }
     }
 }
