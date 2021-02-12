@@ -15,20 +15,5 @@ namespace AffiliateCrawlers.Pages
         {
             return new List<ProductInfoModel>();
         }
-
-        public virtual List<string> GetAllProductLink(HtmlNode document, int quantity)
-        {
-            return null;
-        }
-
-        public virtual List<string> GetAllProductLink2(HtmlWeb web, string url, int quantity)
-        {
-            return null;
-        }
-
-        public virtual List<string> GetAllItems(int numberOfItems)
-        {
-            return new List<string>();
-        }
     }
 }

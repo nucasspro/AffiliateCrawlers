@@ -35,7 +35,7 @@ namespace AffiliateCrawlers.Pages
             try
             {
                 var web = new HtmlWeb();
-                var productUrls = GetAllProductLink2(web, url, quantity);
+                var productUrls = GetAllProductLink(web, url, quantity);
 
                 return GetAllProductInfo(web, productUrls).ToList();
             }
@@ -52,10 +52,9 @@ namespace AffiliateCrawlers.Pages
         /// <param name="document"></param>
         /// <param name="quantity"></param>
         /// <returns></returns>
-        public override List<string> GetAllProductLink2(HtmlWeb web, string url, int quantity)
+        public List<string> GetAllProductLink(HtmlWeb web, string url, int quantity)
         {
             List<string> links = new();
-            string nextPageLink = string.Empty;
 
             HtmlDocument doc;
             HtmlNode document;
@@ -80,7 +79,7 @@ namespace AffiliateCrawlers.Pages
 
                 if (!HasNextPage(document, ref url))
                 {
-                    break;
+                    return links;
                 }
             } while (links.Count < quantity);
 
