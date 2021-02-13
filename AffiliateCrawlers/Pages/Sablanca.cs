@@ -1,16 +1,11 @@
 ﻿using AffiliateCrawlers.Models;
 using AffiliateCrawlers.Models.PageModels;
-using Caliburn.Micro;
-using HtmlAgilityPack;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace AffiliateCrawlers.Pages
@@ -28,81 +23,80 @@ namespace AffiliateCrawlers.Pages
         {
             try
             {
-                var allData = GetAllProductLink(null, url, quantity);
-
-                StringBuilder allDataString = new();
-                foreach (var item in allData)
-                {
-                    allDataString.Append(item);
-                }
-
-                var allDataObject = JsonConvert.DeserializeObject<List<SablancaModel>>(allDataString.ToString());
-
+                return GetAllProductInfo(url, quantity);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                return null;
+                return new List<ProductInfoModel>();
             }
-
-            //Driver.Url = url;
-            //Driver.Navigate();
-            //Utilities.ScrollDown(Driver);
-
-            // GetAllItems(1);
-            return null;
         }
 
-        public List<string> GetAllProductLink(HtmlWeb web, string url, int quantity)
+        public List<ProductInfoModel> GetAllProductInfo(string url, int quantity, int startPageIndex = 0, int pageSize = 12)
         {
-            List<string> links = new();
+            List<ProductInfoModel> allData = new();
             var client = new RestClient(url)
             {
                 Timeout = -1
             };
 
             var request = new RestRequest(Method.POST);
-            int pageIndex = 0;
+
             do
             {
                 request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
                 request.AddHeader("Cookie", "ASP.NET_SessionId=kbsiqsu3pvbzq3k4ma1iyjqe; BNIS_x-bni-jas=MtpT/DLkhzTE5WmTnxNLKFFRG3hMSp1UvxePQcQbI3U4l7J+Sz6amsTw/2BnDz7eX5ie8cXiuZJEboTPXE1W44Tr32dPsZkSVjQnRC/g6msu+7fGgk7ZSQ==");
                 request.AddParameter("order", "");
-                request.AddParameter("pageindex", pageIndex);
-                request.AddParameter("pagesize", "12");
+                request.AddParameter("pageindex", startPageIndex);
+                request.AddParameter("pagesize", pageSize);
                 IRestResponse response = client.Execute(request);
 
-                if (response.Content == string.Empty)
+                if (response.Content?.Length == 0)
                 {
-                    return links;
+                    return allData;
                 }
 
-                var allData = JsonConvert.DeserializeObject<List<SablancaModel>>(response.Content);
-                foreach (var item in allData)
+                foreach (var item in JsonConvert.DeserializeObject<List<SablancaModel>>(response.Content))
                 {
-                    links.Add("");
+                    if (allData.Count >= quantity)
+                    {
+                        return allData;
+                    }
+
+                    allData.Add(GetData(item));
                 }
 
+                startPageIndex++;
+            } while (allData.Count < quantity);
 
-                pageIndex++;
-            } while (links.Count < quantity);
-            return new List<string>();
+            return allData;
         }
 
-
-        public void GetData()
+        public ProductInfoModel GetData(SablancaModel item)
         {
-            //ITEMNAME
-            //LISTIMAGES
-            //giam gia SALEPRICE
-            //gia goc RETAILPRICE
+            string name = item.ITEMNAME;
+            string url = $"{Host}{item.MAINGROUPLINK}/{item.NAMEID}";
+            string originalPrice = item.RETAILPRICE.ToString();
+            string salePrice = item.SALEPRICE.ToString();
+            List<string> imageLinks = item.LISTIMAGES;
 
-            //MATERIALTEXT: chất liệu
-            //STRAPTYPETEXT: Loại dây đeo
-            //DIMENSION: kích thước
-            //COMPARTMENT: số ngăn
-            //STYLETEXT: Dòng
-            //DESCRIPTION: Mô tả
+            StringBuilder content = new StringBuilder()
+                .Append("Chất liệu: ").Append(item.MATERIALTEXT).Append(Environment.NewLine)
+                .Append("Loại dây đeo: ").Append(item.STRAPTYPETEXT).Append(Environment.NewLine)
+                .Append("Kích thước: ").Append(item.DIMENSION).Append(Environment.NewLine)
+                .Append("Số ngăn: ").Append(item.COMPARTMENT).Append(Environment.NewLine)
+                .Append("Dòng: ").Append(item.STYLETEXT).Append(Environment.NewLine)
+                .Append("Mô tả: ").Append(item.DESCRIPTION).Append(Environment.NewLine);
+
+            return new ProductInfoModel()
+            {
+                Name = name,
+                Url = url,
+                Content = content.ToString(),
+                OriginalPrice = originalPrice,
+                SalePrice = salePrice,
+                ImageLinks = imageLinks,
+            };
         }
     }
 }
