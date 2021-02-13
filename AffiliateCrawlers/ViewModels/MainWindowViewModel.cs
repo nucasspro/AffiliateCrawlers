@@ -1,7 +1,6 @@
 ﻿using AffiliateCrawlers.Models;
 using AffiliateCrawlers.Pages;
 using Caliburn.Micro;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -73,18 +72,18 @@ namespace AffiliateCrawlers.ViewModels
             set { _txtQuantity = value; NotifyOfPropertyChange(() => TxtQuantity); }
         }
 
-        private string _tbxAllData;
-
-        public string TbxAllData
-        {
-            get => _tbxAllData;
-            set { _tbxAllData = value; NotifyOfPropertyChange(() => TbxAllData); }
-        }
-
         public void CbbMainPageSelectionChanged()
         {
             CbbChildPageItemsSource = new ObservableCollection<string>(cbbChildPageItemsSource[CbbMainPageSelectedIndex]);
             CbbChildPageSelectedIndex = 0;
+        }
+
+        private ObservableCollection<ProductInfoViewModel> _productViewData;
+
+        public ObservableCollection<ProductInfoViewModel> ProductViewData
+        {
+            get => _productViewData;
+            set { _productViewData = value; NotifyOfPropertyChange(() => ProductViewData); }
         }
 
         public MainWindowViewModel()
@@ -95,7 +94,7 @@ namespace AffiliateCrawlers.ViewModels
 
         private CrawlPageBase _crawlPage;
 
-        private List<ProductInfoModel> _data = new();
+        private List<ProductInfoModel> _products = new();
 
         public void StartCrawl()
         {
@@ -118,36 +117,34 @@ namespace AffiliateCrawlers.ViewModels
                     return;
             }
 
-            _data = _crawlPage.Start(crawlLink, TxtQuantity);
-            UpdateGUI(_data);
+            _products = _crawlPage.Start(crawlLink, TxtQuantity);
+            UpdateGUI(_products);
         }
 
         private void UpdateGUI(List<ProductInfoModel> data)
         {
+            ProductViewData = new();
             foreach (var item in data)
             {
-                TbxAllData += $"======================================{ Environment.NewLine }" +
-                    $"ProductName = { item.Name }{ Environment.NewLine }" +
-                    $"OriginalPrice = { item.OriginalPrice }{ Environment.NewLine }" +
-                    $"SalePrice = { item.SalePrice }{ Environment.NewLine }" +
-                    $"Content = { item.Content }{ Environment.NewLine }" +
-                    $"ImageLinks = { Environment.NewLine }";
-
-                foreach (var link in item.ImageLinks)
+                ProductViewData.Add(new ProductInfoViewModel
                 {
-                    TbxAllData += $"\t{ link }{ Environment.NewLine}";
-                }
+                    Name = item.Name,
+                    OriginalPrice = item.OriginalPrice,
+                    SalePrice = item.SalePrice,
+                    Content = item.Content,
+                    ImageLinks = string.Join(",\r\n", item.ImageLinks)
+                });
             }
         }
 
         public void ExportFile()
         {
-            if (_crawlPage is null || _data.Count is 0)
+            if (_crawlPage is null || _products.Count is 0)
             {
                 return;
             }
 
-            Utilities.ExportToCSVFile(_crawlPage.FileName, _data);
+            Utilities.ExportToCSVFile(_crawlPage.FileName, _products);
         }
     }
 }

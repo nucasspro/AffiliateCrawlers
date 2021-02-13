@@ -6,25 +6,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:AffiliateCrawlers.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="clr-namespace:AffiliateCrawlers.ViewModels"
     Title="{Binding MainScreenTitle}"
-    Width="800"
+    Width="1000"
     Height="450"
-    cal:Message.Attach="[Event Loaded=] = [Action Loaded()]"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="3.5*" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-
             <StackPanel
-                Grid.Row="0"
                 Margin="10"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
@@ -55,33 +49,59 @@
                     TextAlignment="Center"
                     TextWrapping="Wrap" />
 
-            </StackPanel>
-
-            <StackPanel
-                Grid.Row="1"
-                Margin="10"
-                HorizontalAlignment="Right"
-                Orientation="Horizontal">
                 <Button
                     x:Name="btnRun"
                     Width="75"
+                    Margin="20,0,0,0"
                     cal:Message.Attach="[Event Click] = [Action StartCrawl]"
                     Content="Run" />
                 <Button
                     x:Name="btnExportFile"
-                    Width="75"
                     Margin="20,0,0,0"
                     cal:Message.Attach="[Event Click] = [Action ExportFile()]"
-                    Content="Export file" />
+                    Content="Export CSV file" />
             </StackPanel>
         </Grid>
 
-        <ScrollViewer Grid.Row="1">
-            <TextBlock
-                x:Name="tbxAllData"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Top"
-                Text="{Binding TbxAllData}" />
+        <ScrollViewer
+            Grid.Row="1"
+            Margin="10"
+            HorizontalScrollBarVisibility="Visible"
+            VerticalScrollBarVisibility="Visible">
+            <DataGrid
+                x:Name="dataGrid"
+                Height="330"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                ItemsSource="{Binding ProductViewData}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        MinWidth="100"
+                        Binding="{Binding Name}"
+                        Header="Name" />
+                    <DataGridTextColumn
+                        MinWidth="100"
+                        Binding="{Binding Url}"
+                        Header="Url" />
+                    <DataGridTextColumn
+                        MinWidth="100"
+                        Binding="{Binding OriginalPrice}"
+                        Header="OriginalPrice" />
+                    <DataGridTextColumn
+                        MinWidth="100"
+                        Binding="{Binding SalePrice}"
+                        Header="SalePrice" />
+                    <DataGridTextColumn
+                        MinWidth="100"
+                        Binding="{Binding Content}"
+                        Header="Content" />
+                    <DataGridTextColumn
+                        Width="*"
+                        MinWidth="100"
+                        Binding="{Binding ImageLinks}"
+                        Header="ImageLinks" />
+                </DataGrid.Columns>
+            </DataGrid>
         </ScrollViewer>
     </Grid>
 </Window>
