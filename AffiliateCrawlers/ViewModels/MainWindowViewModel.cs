@@ -98,7 +98,6 @@ namespace AffiliateCrawlers.ViewModels
 
         public void StartCrawl()
         {
-            string crawlLink = CbbChildPageItemsSource[CbbChildPageSelectedIndex];
             switch (CbbMainPageItemsSource[CbbMainPageSelectedIndex])
             {
                 case "sablanca.vn":
@@ -117,6 +116,12 @@ namespace AffiliateCrawlers.ViewModels
                     return;
             }
 
+            if (_crawlPage is null)
+            {
+                return;
+            }
+
+            string crawlLink = CbbChildPageItemsSource[CbbChildPageSelectedIndex];
             _products = _crawlPage.Start(crawlLink, TxtQuantity);
             UpdateGUI(_products);
         }
