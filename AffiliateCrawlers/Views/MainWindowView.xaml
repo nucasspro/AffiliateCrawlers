@@ -8,8 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodels="clr-namespace:AffiliateCrawlers.ViewModels"
     Title="{Binding MainScreenTitle}"
-    Width="1000"
-    Height="450"
+    Width="1300"
+    Height="700"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
@@ -63,45 +63,68 @@
             </StackPanel>
         </Grid>
 
-        <ScrollViewer
+
+        <DataGrid
+            x:Name="dataGrid"
             Grid.Row="1"
+            Height="600"
             Margin="10"
-            HorizontalScrollBarVisibility="Visible"
-            VerticalScrollBarVisibility="Visible">
-            <DataGrid
-                x:Name="dataGrid"
-                Height="330"
-                AutoGenerateColumns="False"
-                IsReadOnly="True"
-                ItemsSource="{Binding ProductViewData}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        MinWidth="100"
-                        Binding="{Binding Name}"
-                        Header="Name" />
-                    <DataGridTextColumn
-                        MinWidth="100"
-                        Binding="{Binding Url}"
-                        Header="Url" />
-                    <DataGridTextColumn
-                        MinWidth="100"
-                        Binding="{Binding OriginalPrice}"
-                        Header="OriginalPrice" />
-                    <DataGridTextColumn
-                        MinWidth="100"
-                        Binding="{Binding SalePrice}"
-                        Header="SalePrice" />
-                    <DataGridTextColumn
-                        MinWidth="100"
-                        Binding="{Binding Content}"
-                        Header="Content" />
-                    <DataGridTextColumn
-                        Width="*"
-                        MinWidth="100"
-                        Binding="{Binding ImageLinks}"
-                        Header="ImageLinks" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </ScrollViewer>
+            AutoGenerateColumns="False"
+            IsReadOnly="True"
+            ItemsSource="{Binding ProductViewData}">
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    MinWidth="100"
+                    Binding="{Binding Name}"
+                    Header="Name">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="100"
+                    Binding="{Binding Url}"
+                    Header="Url">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="100"
+                    Binding="{Binding OriginalPrice}"
+                    Header="OriginalPrice" />
+                <DataGridTextColumn
+                    Width="100"
+                    Binding="{Binding SalePrice}"
+                    Header="SalePrice" />
+                <DataGridTextColumn
+                    MinWidth="100"
+                    MaxWidth="400"
+                    Binding="{Binding Content}"
+                    Header="Content">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="*"
+                    MinWidth="100"
+                    MaxWidth="400"
+                    Binding="{Binding ImageLinks}"
+                    Header="ImageLinks">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>

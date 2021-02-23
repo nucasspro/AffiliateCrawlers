@@ -134,6 +134,7 @@ namespace AffiliateCrawlers.ViewModels
                 ProductViewData.Add(new ProductInfoViewModel
                 {
                     Name = item.Name,
+                    Url = item.Url,
                     OriginalPrice = item.OriginalPrice,
                     SalePrice = item.SalePrice,
                     Content = item.Content,
