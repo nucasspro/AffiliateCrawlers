@@ -3,6 +3,9 @@ using AffiliateCrawlers.Pages;
 using Caliburn.Micro;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
+using System;
+using System.IO;
 
 namespace AffiliateCrawlers.ViewModels
 {
@@ -147,10 +150,37 @@ namespace AffiliateCrawlers.ViewModels
         {
             if (_crawlPage is null || _products.Count is 0)
             {
+                MessageBox.Show("Không có dữ liệu để xuất file");
                 return;
             }
 
-            Utilities.ExportToCSVFile(_crawlPage.FileName, _products);
+            try
+            {
+                // Open dialog for selecting save folder
+                string folderPath = string.Empty;
+
+                System.Windows.Forms.FolderBrowserDialog diag = new();
+                if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    folderPath = diag.SelectedPath;
+                }
+
+                if (folderPath?.Length == 0)
+                {
+                    MessageBox.Show("Folder chọn không hợp lên");
+                    return;
+                }
+
+                string fullFilePath = Path.Combine(folderPath, $"{_crawlPage.FileName}{DateTime.Now:yyyyMMdd_hhmmss}.txt");
+
+                Utilities.ExportToCSVFile(fullFilePath, _products);
+
+                MessageBox.Show("Xuất file thành công");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Xuất file không thành công");
+            }
         }
     }
 }

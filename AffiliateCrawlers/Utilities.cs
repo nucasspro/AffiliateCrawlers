@@ -35,11 +35,11 @@ namespace AffiliateCrawlers
             }
         }
 
-        public static void ExportToCSVFile(string fileName, List<ProductInfoModel> data)
+        public static void ExportToCSVFile(string fullFilePath, List<ProductInfoModel> data)
         {
             try
             {
-                string path = Path.Combine(Directory.GetCurrentDirectory(), $"{fileName}{DateTime.Now:yyyyMMdd_hhmmss}.txt");
+                string path = fullFilePath;
                 List<string> header = new() { "No", "Name", "Url", "OriginalPrice", "SalePrice", "Content", "ImageLinks" };
 
                 using var writer = new StreamWriter(path);
