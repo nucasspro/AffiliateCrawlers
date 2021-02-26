@@ -1,7 +1,7 @@
-﻿using AffiliateCrawlers.Models;
+﻿using AffiliateCrawlers.Commons;
+using AffiliateCrawlers.Models;
 using AffiliateCrawlers.Models.PageModels;
 using Newtonsoft.Json;
-using OpenQA.Selenium.Remote;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -12,13 +12,21 @@ namespace AffiliateCrawlers.Pages
 {
     public class Sablanca : CrawlPageBase
     {
-        public Sablanca(RemoteWebDriver driver)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Sablanca()
         {
-            Host = "https://sablanca.vn/";
-            FileName = "sablanca_";
-            Driver = driver;
+            Host = Constants.Sablanca.HostName;
+            FileName = Constants.Sablanca.FileName;
         }
 
+        /// <summary>
+        /// Start crawler
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="quantity"></param>
+        /// <returns></returns>
         public override List<ProductInfoModel> Start(string url, int quantity)
         {
             try
@@ -32,6 +40,14 @@ namespace AffiliateCrawlers.Pages
             }
         }
 
+        /// <summary>
+        /// Get product info
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="quantity"></param>
+        /// <param name="startPageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         public List<ProductInfoModel> GetAllProductInfo(string url, int quantity, int startPageIndex = 0, int pageSize = 12)
         {
             List<ProductInfoModel> allData = new();
@@ -72,7 +88,12 @@ namespace AffiliateCrawlers.Pages
             return allData;
         }
 
-        public ProductInfoModel GetData(SablancaModel item)
+        /// <summary>
+        /// Get data
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        private ProductInfoModel GetData(SablancaModel item)
         {
             string name = item.ITEMNAME;
             string url = $"{Host}{item.MAINGROUPLINK}/{item.NAMEID}";
@@ -81,12 +102,12 @@ namespace AffiliateCrawlers.Pages
             List<string> imageLinks = item.LISTIMAGES;
 
             StringBuilder content = new StringBuilder()
-                .Append("Chất liệu: ").Append(item.MATERIALTEXT).Append(Environment.NewLine)
-                .Append("Loại dây đeo: ").Append(item.STRAPTYPETEXT).Append(Environment.NewLine)
-                .Append("Kích thước: ").Append(item.DIMENSION).Append(Environment.NewLine)
-                .Append("Số ngăn: ").Append(item.COMPARTMENT).Append(Environment.NewLine)
-                .Append("Dòng: ").Append(item.STYLETEXT).Append(Environment.NewLine)
-                .Append("Mô tả: ").Append(item.DESCRIPTION).Append(Environment.NewLine);
+                .Append(Constants.Sablanca.MaterialText).Append(':').Append(item.MATERIALTEXT).Append(Environment.NewLine)
+                .Append(Constants.Sablanca.StrapTypeText).Append(':').Append(item.STRAPTYPETEXT).Append(Environment.NewLine)
+                .Append(Constants.Sablanca.DimensionText).Append(':').Append(item.DIMENSION).Append(Environment.NewLine)
+                .Append(Constants.Sablanca.CompartmentText).Append(':').Append(item.COMPARTMENT).Append(Environment.NewLine)
+                .Append(Constants.Sablanca.StyleText).Append(':').Append(item.STYLETEXT).Append(Environment.NewLine)
+                .Append(Constants.Sablanca.Description).Append(':').Append(item.DESCRIPTION).Append(Environment.NewLine);
 
             return new ProductInfoModel()
             {

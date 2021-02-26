@@ -1,7 +1,7 @@
-﻿using AffiliateCrawlers.Models;
+﻿using AffiliateCrawlers.Commons;
+using AffiliateCrawlers.Models;
 using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
-using OpenQA.Selenium.Remote;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,18 +17,17 @@ namespace AffiliateCrawlers.Pages
         /// Constructor
         /// </summary>
         /// <param name="driver"></param>
-        public Sexyforever(RemoteWebDriver driver = null)
+        public Sexyforever()
         {
-            Host = "https://sexyforever.vn";
-            FileName = "sexyforever_";
-            Driver = driver;
+            Host = Constants.Sexyforever.HostName;
+            FileName = Constants.Sexyforever.FileName;
         }
 
         /// <summary>
         /// Start crawler
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="numberOfItems"></param>
+        /// <param name="quantity"></param>
         /// <returns></returns>
         public override List<ProductInfoModel> Start(string url, int quantity)
         {
@@ -49,7 +48,8 @@ namespace AffiliateCrawlers.Pages
         /// <summary>
         /// Get all product link
         /// </summary>
-        /// <param name="document"></param>
+        /// <param name="web"></param>
+        /// <param name="url"></param>
         /// <param name="quantity"></param>
         /// <returns></returns>
         public List<string> GetAllProductLink(HtmlWeb web, string url, int quantity)
@@ -89,7 +89,7 @@ namespace AffiliateCrawlers.Pages
         /// <summary>
         /// Get all product info
         /// </summary>
-        /// <param name="document"></param>
+        /// <param name="web"></param>
         /// <param name="urls"></param>
         /// <returns></returns>
         private IEnumerable<ProductInfoModel> GetAllProductInfo(HtmlWeb web, IEnumerable<string> urls)
@@ -103,7 +103,7 @@ namespace AffiliateCrawlers.Pages
         /// <summary>
         /// Get product info
         /// </summary>
-        /// <param name="document"></param>
+        /// <param name="web"></param>
         /// <param name="url"></param>
         /// <returns></returns>
         private ProductInfoModel GetProductInfo(HtmlWeb web, string url)
@@ -115,21 +115,35 @@ namespace AffiliateCrawlers.Pages
             res.Name = GetProductName(document);
             res.Url = url;
             res.Content = GetProductContent(document);
-            res.OriginalPrice = GetProductOriginalPrice(document);
-            res.SalePrice = GetProductSalePrice(document);
+            (res.SalePrice, res.OriginalPrice) = GetProductPrice(document);
             res.ImageLinks = GetProductImages(document).ToList();
 
             return res;
         }
 
         /// <summary>
-        /// Get product content
+        /// Get product name
         /// </summary>
         /// <param name="document"></param>
         /// <returns></returns>
         private string GetProductName(HtmlNode document)
         {
-            return document.QuerySelector(".product-content > .pro-content-head > h1").InnerText;
+            return document
+                .QuerySelector(".product-content > .pro-content-head > h1")
+                .InnerText;
+        }
+
+        /// <summary>
+        /// Get sale price and original price
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        private (string, string) GetProductPrice(HtmlNode document)
+        {
+            var salePrice = GetProductSalePrice(document);
+            var originalPrice = GetProductOriginalPrice(document) ?? salePrice;
+
+            return (salePrice, originalPrice);
         }
 
         /// <summary>
@@ -166,7 +180,8 @@ namespace AffiliateCrawlers.Pages
         /// <returns></returns>
         private string GetProductContent(HtmlNode document)
         {
-            var content = document.QuerySelector(".product-content > .pro-short-desc")
+            var content = document
+                .QuerySelector(".product-content > .pro-short-desc")
                 .InnerHtml
                 .Replace("\t", "");
 

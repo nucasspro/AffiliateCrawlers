@@ -1,25 +1,35 @@
-﻿using AffiliateCrawlers.Models;
+﻿using AffiliateCrawlers.Commons;
+using AffiliateCrawlers.Models;
 using AffiliateCrawlers.Pages;
 using Caliburn.Micro;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows;
-using System;
 using System.IO;
+using System.Windows;
 
 namespace AffiliateCrawlers.ViewModels
 {
     public class MainWindowViewModel : Screen
     {
-        public string MainScreenTitle { get; } = "AffiliateCrawlers";
+        /// <summary>
+        /// App name
+        /// </summary>
+        public string MainScreenTitle { get; } = Constants.AppConstants.AppName;
 
+        /// <summary>
+        /// Main combobox
+        /// </summary>
         public List<string> CbbMainPageItemsSource { get; } = new()
         {
-            "sablanca.vn",
-            "sexyforever.vn",
-            "sevenam.vn"
+            Constants.Sablanca.SiteName,
+            Constants.Sexyforever.SiteName,
+            Constants.Sevenam.SiteName
         };
 
+        /// <summary>
+        /// Sub combobox
+        /// </summary>
         private readonly List<ObservableCollection<string>> cbbChildPageItemsSource = new()
         {
             new ObservableCollection<string>
@@ -42,6 +52,16 @@ namespace AffiliateCrawlers.ViewModels
                 "https://sevenam.vn/collections/onsale"
             }
         };
+
+        /// <summary>
+        /// Crawler instance
+        /// </summary>
+        private CrawlPageBase _crawlPage;
+
+        /// <summary>
+        /// All products
+        /// </summary>
+        private List<ProductInfoModel> _products = new();
 
         private ObservableCollection<string> _cbbChildPageItemsSource;
 
@@ -89,29 +109,31 @@ namespace AffiliateCrawlers.ViewModels
             set { _productViewData = value; NotifyOfPropertyChange(() => ProductViewData); }
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public MainWindowViewModel()
         {
             CbbChildPageItemsSource = new ObservableCollection<string>(cbbChildPageItemsSource[0]);
             CbbChildPageSelectedIndex = 0;
         }
 
-        private CrawlPageBase _crawlPage;
-
-        private List<ProductInfoModel> _products = new();
-
+        /// <summary>
+        /// Start scrawler
+        /// </summary>
         public void StartCrawl()
         {
             switch (CbbMainPageItemsSource[CbbMainPageSelectedIndex])
             {
-                case "sablanca.vn":
-                    _crawlPage = new Sablanca(null);
+                case Constants.Sablanca.SiteName:
+                    _crawlPage = new Sablanca();
                     break;
 
-                case "sexyforever.vn":
+                case Constants.Sexyforever.SiteName:
                     _crawlPage = new Sexyforever();
                     break;
 
-                case "sevenam.vn":
+                case Constants.Sevenam.SiteName:
                     _crawlPage = new Sevenam();
                     break;
 
@@ -146,11 +168,14 @@ namespace AffiliateCrawlers.ViewModels
             }
         }
 
+        /// <summary>
+        /// Export file
+        /// </summary>
         public void ExportFile()
         {
             if (_crawlPage is null || _products.Count is 0)
             {
-                MessageBox.Show("Không có dữ liệu để xuất file");
+                MessageBox.Show(Constants.AppConstants.DataIsEmpty);
                 return;
             }
 
@@ -167,19 +192,19 @@ namespace AffiliateCrawlers.ViewModels
 
                 if (folderPath?.Length == 0)
                 {
-                    MessageBox.Show("Folder chọn không hợp lên");
+                    MessageBox.Show(Constants.AppConstants.WrongFolder);
                     return;
                 }
 
-                string fullFilePath = Path.Combine(folderPath, $"{_crawlPage.FileName}{DateTime.Now:yyyyMMdd_hhmmss}.txt");
+                string fullFilePath = Path.Combine(folderPath, $"{_crawlPage.FileName}{DateTime.Now:yyyyMMdd_hhmmss}.{Constants.AppConstants.TextFileExtension}");
 
                 Utilities.ExportToCSVFile(fullFilePath, _products);
 
-                MessageBox.Show("Xuất file thành công");
+                MessageBox.Show(Constants.AppConstants.ExportFileSuccessful);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Xuất file không thành công");
+                MessageBox.Show(Constants.AppConstants.ExportFileFailure);
             }
         }
     }
