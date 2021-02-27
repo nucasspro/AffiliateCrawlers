@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
+using System.Reflection;
 
 namespace AffiliateCrawlers.ViewModels
 {
@@ -62,6 +63,8 @@ namespace AffiliateCrawlers.ViewModels
         /// All products
         /// </summary>
         private List<ProductInfoModel> _products = new();
+
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private ObservableCollection<string> _cbbChildPageItemsSource;
 

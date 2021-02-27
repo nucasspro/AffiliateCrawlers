@@ -7,11 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="log4net.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Caliburn.Micro" Version="4.0.136-rc" />
     <PackageReference Include="CsvHelper" Version="25.0.0" />
     <PackageReference Include="Fizzler" Version="1.3.0" />
     <PackageReference Include="Fizzler.Systems.HtmlAgilityPack" Version="1.2.1" />
-    <PackageReference Include="NLog" Version="4.7.8" />
+    <PackageReference Include="log4net" Version="2.0.12" />
     <PackageReference Include="RestSharp" Version="106.11.8-alpha.0.12" />
     <PackageReference Include="Selenium.Chrome.WebDriver" Version="85.0.0" />
     <PackageReference Include="Selenium.Firefox.WebDriver" Version="0.27.0" />
