@@ -1,5 +1,6 @@
 ﻿using AffiliateCrawlers.Commons;
 using AffiliateCrawlers.Models;
+using Caliburn.Micro;
 using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
 using System;
@@ -13,14 +14,17 @@ namespace AffiliateCrawlers.Pages
 {
     public class Sexyforever : CrawlPageBase
     {
+        private readonly log4net.ILog _log;
+
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="driver"></param>
-        public Sexyforever()
+        /// <param name="log"></param>
+        public Sexyforever(log4net.ILog log)
         {
             Host = Constants.Sexyforever.HostName;
             FileName = Constants.Sexyforever.FileName;
+            _log = log;
         }
 
         /// <summary>
@@ -36,10 +40,13 @@ namespace AffiliateCrawlers.Pages
                 var web = new HtmlWeb();
                 var productUrls = GetAllProductLink(web, url, quantity);
 
+                _log.Info("Get all data successfully");
+
                 return GetAllProductInfo(web, productUrls).ToList();
             }
             catch (Exception ex)
             {
+                _log.Error($"{ex.Message}\r\n{ex.StackTrace}");
                 MessageBox.Show(ex.Message);
                 return null;
             }
@@ -70,7 +77,11 @@ namespace AffiliateCrawlers.Pages
                 }
                 foreach (var item in urls)
                 {
-                    links.Add($"{ Host }{ item.GetAttributeValue("href", string.Empty) }");
+                    string link = $"{Host}{item.GetAttributeValue("href", string.Empty)}";
+                    links.Add(link);
+
+                    _log.Debug($"Add new link: {link}");
+
                     if (links.Count >= quantity)
                     {
                         return links;
@@ -118,6 +129,7 @@ namespace AffiliateCrawlers.Pages
             (res.SalePrice, res.OriginalPrice) = GetProductPrice(document);
             res.ImageLinks = GetProductImages(document).ToList();
 
+            _log.Debug($"Get new product: {res.Name} - {res.Url}");
             return res;
         }
 
@@ -219,9 +231,13 @@ namespace AffiliateCrawlers.Pages
                 if (nextPageLink.Length != 0)
                 {
                     nextPageLink = $"{ Host }{ nextPageLink }";
+
+                    _log.Info("Can go to next page");
                     return true;
                 }
             }
+
+            _log.Info("Can't go to next page");
             return false;
         }
     }

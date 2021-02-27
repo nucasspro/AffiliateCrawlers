@@ -8,14 +8,20 @@ namespace AffiliateCrawlers
     /// </summary>
     public partial class App : Application
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(App));
+        private static readonly ILog _log = LogManager.GetLogger(typeof(App));
 
         protected override void OnStartup(StartupEventArgs e)
         {
             log4net.Config.XmlConfigurator.Configure();
-            log.Info("        =============  Started Logging  =============        ");
+            _log.Info("        =============  Started Logging  =============        ");
 
             base.OnStartup(e);
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            _log.Info("        =============  Ended Logging  =============        ");
+            base.OnExit(e);
         }
     }
 }

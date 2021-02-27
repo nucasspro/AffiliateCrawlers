@@ -64,7 +64,6 @@
             </StackPanel>
         </Grid>
 
-
         <DataGrid
             x:Name="dataGrid"
             Grid.Row="1"

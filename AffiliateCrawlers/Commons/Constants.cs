@@ -3,7 +3,7 @@
     public static class Constants
     {
         /// <summary>
-        /// App constants
+        /// Application constants
         /// </summary>
         public static class AppConstants
         {

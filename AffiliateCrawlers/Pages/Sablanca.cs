@@ -12,13 +12,16 @@ namespace AffiliateCrawlers.Pages
 {
     public class Sablanca : CrawlPageBase
     {
+        private readonly log4net.ILog _log;
+
         /// <summary>
         /// Constructor
         /// </summary>
-        public Sablanca()
+        public Sablanca(log4net.ILog log)
         {
             Host = Constants.Sablanca.HostName;
             FileName = Constants.Sablanca.FileName;
+            _log = log;
         }
 
         /// <summary>
@@ -31,7 +34,11 @@ namespace AffiliateCrawlers.Pages
         {
             try
             {
-                return GetAllProductInfo(url, quantity);
+                var products = GetAllProductInfo(url, quantity);
+
+                _log.Info("Get all data successfully");
+
+                return products;
             }
             catch (Exception ex)
             {
@@ -108,6 +115,8 @@ namespace AffiliateCrawlers.Pages
                 .Append(Constants.Sablanca.CompartmentText).Append(':').Append(item.COMPARTMENT).Append(Environment.NewLine)
                 .Append(Constants.Sablanca.StyleText).Append(':').Append(item.STYLETEXT).Append(Environment.NewLine)
                 .Append(Constants.Sablanca.Description).Append(':').Append(item.DESCRIPTION).Append(Environment.NewLine);
+
+            _log.Debug($"Get new product: {name} - {url}");
 
             return new ProductInfoModel()
             {

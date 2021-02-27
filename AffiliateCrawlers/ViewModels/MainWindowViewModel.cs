@@ -6,15 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Windows;
 using System.Reflection;
+using System.Windows;
 
 namespace AffiliateCrawlers.ViewModels
 {
     public class MainWindowViewModel : Screen
     {
         /// <summary>
-        /// App name
+        /// Application name
         /// </summary>
         public string MainScreenTitle { get; } = Constants.AppConstants.AppName;
 
@@ -129,15 +129,15 @@ namespace AffiliateCrawlers.ViewModels
             switch (CbbMainPageItemsSource[CbbMainPageSelectedIndex])
             {
                 case Constants.Sablanca.SiteName:
-                    _crawlPage = new Sablanca();
+                    _crawlPage = new Sablanca(_log);
                     break;
 
                 case Constants.Sexyforever.SiteName:
-                    _crawlPage = new Sexyforever();
+                    _crawlPage = new Sexyforever(_log);
                     break;
 
                 case Constants.Sevenam.SiteName:
-                    _crawlPage = new Sevenam();
+                    _crawlPage = new Sevenam(_log);
                     break;
 
                 default:
@@ -156,18 +156,28 @@ namespace AffiliateCrawlers.ViewModels
 
         private void UpdateGUI(List<ProductInfoModel> data)
         {
-            ProductViewData = new();
-            foreach (var item in data)
+            try
             {
-                ProductViewData.Add(new ProductInfoViewModel
+                ProductViewData = new();
+                foreach (var item in data)
                 {
-                    Name = item.Name,
-                    Url = item.Url,
-                    OriginalPrice = item.OriginalPrice,
-                    SalePrice = item.SalePrice,
-                    Content = item.Content,
-                    ImageLinks = string.Join(",\r\n", item.ImageLinks)
-                });
+                    ProductViewData.Add(new ProductInfoViewModel
+                    {
+                        Name = item.Name,
+                        Url = item.Url,
+                        OriginalPrice = item.OriginalPrice,
+                        SalePrice = item.SalePrice,
+                        Content = item.Content,
+                        ImageLinks = string.Join(",\r\n", item.ImageLinks)
+                    });
+                }
+
+                _log.Info("Update GUI successfully");
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"{ex.Message}{ex.StackTrace}");
+                throw;
             }
         }
 
@@ -203,10 +213,12 @@ namespace AffiliateCrawlers.ViewModels
 
                 Utilities.ExportToCSVFile(fullFilePath, _products);
 
+                _log.Info($"Export file successfully");
                 MessageBox.Show(Constants.AppConstants.ExportFileSuccessful);
             }
             catch (Exception ex)
             {
+                _log.Error($"Cannot export file {ex.Message}\r\n{ex.StackTrace}");
                 MessageBox.Show(Constants.AppConstants.ExportFileFailure);
             }
         }
